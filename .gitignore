@@ -58,3 +58,4 @@ dkms.conf
 *.user
 /OpenGLFramework/Debug
 /OpenGLFramework/x64/Debug
+*.db
