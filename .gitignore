@@ -53,3 +53,8 @@ dkms.conf
 
 # debug information files
 *.dwo
+/.vs/Final Game
+/Game/x64/Debug
+*.user
+/OpenGLFramework/Debug
+/OpenGLFramework/x64/Debug
