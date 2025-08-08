@@ -59,3 +59,5 @@ dkms.conf
 /OpenGLFramework/Debug
 /OpenGLFramework/x64/Debug
 *.db
+/.vs
+/Game/Debug
