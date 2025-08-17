@@ -17,7 +17,7 @@ typedef struct tile_t
     Bounds2D tileBounds;    // bounds of tile
  
     void* setColor;
-    long color;
+    uint32_t color;
     InteractionCB _interactionCB;
 } Tile;
 
@@ -51,38 +51,51 @@ Tile* tileNew(Guest* guest, void* interactCB)
 	Tile* tile = malloc(sizeof(Tile));
     assert(tile != NULL);
 
-#ifndef TILE_TESTING
-    /// empty parameter: NO GUEST
-    if (guest == NULL)
-    {
-        tile->characterStruct = NULL;
-        tile->interactionCB = interactCB;
-        tile->hoverCB = NULL;
-    }
-
-    /// non empty parameter: HAS GUEST
-    //else
-    //{
-    //    
-    //}
-#else
-    tile->_interactionCB = interactCB;
-#endif
-
 	return tile;
+}
+
+
+/// @brief 
+/// @param topLeftStart - screen coordinate of the top-left corner of the tile
+/// @param width
+/// @param height 
+/// @return 
+Tile* tileNewTest(Coord2D topLeftStart, float width, float height)
+{
+    Tile* tile = malloc(sizeof(Tile));
+    assert(tile != NULL);
+
+    // register object... Or do we? @return to this later
+    objInit(&tile->obj, &_tileVtable, topLeftStart, (Coord2D){0, 0});
+
+    // set the tile bounds
+    tile->tileBounds.topLeft = topLeftStart;
+    tile->tileBounds.botRight.x = topLeftStart.x + width;
+    tile->tileBounds.botRight.y = topLeftStart.y + height;
+
+    // set the interaction callback
+    tile->_interactionCB = NULL;
+
+    // set the color to white by default
+    tile->color = 0xFFFFFFFF;
+
+    return tile;
 }
 
 /// Dtor
 void tileDelete(Tile* tile)
 {
+    objDeinit(&tile->obj);
 
+    free(tile);
 }
 
 /// TEST FUNCTIONS
 #ifdef TILE_TESTING
-void tileSetColor(Tile* tile, long color)
+void tileSetColor(Tile* tile, uint32_t color)
 {
     //tile->color = color;
+    tile->color = color; // cast to long to match the type in the struct
 }
 
 void tileFillRed(Tile* tile)
@@ -116,7 +129,7 @@ void _tileDraw(Object* obj)
     // call shape draw functions
     shapeDrawRect(obj->position.x, 
         obj->position.y, 
-        obj->position.x + tile->tileBounds.botRight.x, 
+        tile->tileBounds.botRight.x, 
         tile->tileBounds.botRight.y, 
         red, green, blue, 
         filledVal);

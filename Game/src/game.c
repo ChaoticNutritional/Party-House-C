@@ -14,10 +14,7 @@ static void _gameDraw();
 static void _gameUpdate(uint32_t milliseconds);
 
 
-/// TESTING Ball manual color change:
-
-
-
+// array of all levels in this game
 static LevelDef _levelDefs[] = {
     {
         {/*{0,0}, {20,20}*/{0, 0}, {974, 600}},		// fieldBounds
@@ -69,8 +66,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             while (running)
             {
                 /// Get Current Window Size
-                //p_fwGetWindowHeight(app);
-                //p_fwGetWindowWidth(app);
+                p_fwGetWindowHeight(app);
+                p_fwGetWindowWidth(app);
+
+
 
                 running = fwUpdateWindow(window);
             }
@@ -90,8 +89,23 @@ static void _gameInit()
     objMgrInit(MAX_OBJECTS);
     levelMgrInit();
     inputInit();
+    
     _curLevel = levelMgrLoad(&_levelDefs[0]);
+}
 
+
+/// @brief Changes game level to passed level definition
+/// @param levelDef - the level definition to change to
+static void _gameChangeLevel(LevelDef* levelDef)
+{
+    assert(levelDef != NULL);
+
+    if (_curLevel != NULL)
+    {
+        levelMgrUnload(_curLevel);
+    }
+
+    _curLevel = levelMgrLoad(levelDef);
 }
 
 /// @brief Cleanup the game and free up any allocated resources
@@ -117,7 +131,3 @@ static void _gameUpdate(uint32_t milliseconds)
     inputUpdate();
     objMgrUpdate(milliseconds);
 }
-
-    /// change levels
-
-    /// accept input

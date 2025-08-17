@@ -1,13 +1,24 @@
 #pragma once
 
-#include "tile.h"
-#include "levelmgr.h"
+#include "baseTypes.h"
+#include "object.h"
 
-typedef struct grid_t
-{
-    uint8_t width;
-    uint8_t height;
-    Tile* firstTile;
-    Tile* lastTile;
-    P_LevelDef* owningLevel;
-} grid;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
+typedef struct grid_t Grid;
+
+Grid* gridNew(Bounds2D bounds);
+
+Grid* gridNewTest(const Bounds2D bounds, uint8_t rows, uint8_t cols, uint32_t color);
+void gridDelete(Grid* grid);
+
+
+static void _gridUpdate(Object* obj, uint32_t milliseconds);
+
+#ifdef __cplusplus
+}
+#endif

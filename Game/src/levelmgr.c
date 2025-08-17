@@ -9,6 +9,7 @@
 #include "face.h"
 #include "sound.h"
 #include "input.h"
+#include "grid.h"
 
 typedef struct level_t
 {
@@ -20,20 +21,21 @@ typedef struct level_t
     Face** faces;
 
     Ball* justBall;
+    Grid* grid;
 } Level;
 
 typedef struct p_level_t
 {
     P_LevelDef* def;
-    UIPanelDef* panels;
-    TextBoxDef* textboxes;
+    //UIPanelDef* panels;
+    //TextBoxDef* textboxes;
+    Grid* grid;           // grid of cells for the party level
+
 } P_Level;
 
 static int32_t _soundId = SOUND_NOSOUND;
 
 static void _levelMgrPlaySound(Ball* ball);
-static void _crashTheGame(void);
-
 
 /// DEMO KEYBIND CALLBACKS
 static void changeBallColorRed(void* ctx)
@@ -97,6 +99,8 @@ Level* levelMgrLoad(const LevelDef* levelDef)
         Bounds2D windowBounds = { {0.0f, 0.0f}, { (float)levelDef->windowWidth, (float)levelDef->windowHeight } };
         level->justBall = ballNew(windowBounds);
 
+        level->grid = gridNewTest(windowBounds, 5, 7, 0xFFFFFF);
+
         inputSetCallback(Z_KEY, changeBallColorBlue, level->justBall);
         inputSetCallback(X_KEY, changeBallColorRed, level->justBall);
     }
@@ -130,9 +134,4 @@ static void _levelMgrPlaySound(Ball* ball)
 {
     Bounds2D bounds = { {0.0f, 0.0f}, {20.0f, 20.0f} };
     soundPlay(_soundId);
-}
-
-void _crashTheGame(void)
-{
-    assert(0);
 }
