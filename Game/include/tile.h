@@ -11,12 +11,16 @@ void tileDelete(Tile* tile);
 
 /// Callback:
 typedef void (*InteractionCB)(Tile*);
-void tileSetInteractionCB(InteractionCB cb);
-void tileClearInteractionCB();
+void tileSetInteractionCB(Tile* tile, InteractionCB cb);
+void tileInvokeInteraction(Tile* tile);
+void tileInvokeCancel(Tile* tile);
+void tileClearInteractionCB(Tile* tile);
 
 /// Testing functions:
 void tileSetColor(Tile* tile, uint32_t color);
 
-void tileFillRed(Tile* tile);
-void tileFillGreen(Tile* tile);
-void tileFillBlue(Tile* tile);
+//InteractionCB tileGetInteractionCB(Tile* tile);
+
+/// Testing
+void* getTileCallback(Tile* tile);
+void* getTileCallback2(Tile* tile);

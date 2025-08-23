@@ -8,31 +8,26 @@
 
 #include "object.h"
 
-#define TILE_TESTING
-
-#ifdef TILE_TESTING
 typedef struct tile_t
 {
     Object obj; // hold space for an object
     Bounds2D tileBounds;    // bounds of tile
- 
-    void* setColor;
     uint32_t color;
     InteractionCB _interactionCB;
 } Tile;
 
-#else
-typedef struct tile_t
-{
-    void* characterStruct;  // will contain sprite sheet and stats
-    void* interactionCB;    // can contain data from character
-    void* hoverCB;          // will perform some actions related to the level that the grid instance a part of
-} Tile;
-#endif
+/// For future reference using character details
+//typedef struct tile_t
+//{
+//    void* characterStruct;  // will contain sprite sheet and stats
+//    void* interactionCB;    // can contain data from character
+//    void* hoverCB;          // will perform some actions related to the level that the grid instance a part of
+//} Tile;
 
 
 /// callback definition
 //static InteractionCB _interactionCB = NULL;
+
 
 static InteractionCB _changeColor = NULL;
 
@@ -90,27 +85,48 @@ void tileDelete(Tile* tile)
     free(tile);
 }
 
-/// TEST FUNCTIONS
-#ifdef TILE_TESTING
+
+
+void tileCBTest(Tile* tile)
+{
+    tile->color = 0xFF0000FF; // set color to blue
+}
+void tileCBTest2(Tile* tile)
+{
+    tile->color = 0xFFFF0000; // set color to red
+}
+
+
+void tileSetInteractionCB(Tile* tile, InteractionCB cb)
+{
+    tile->_interactionCB = cb;
+}
+
+void tileInvokeInteraction(Tile* tile)
+{
+    if (tile != NULL/* && tile->_interactionCB != NULL*/)
+    {
+        tile->_interactionCB = tileCBTest;
+        tile->_interactionCB(tile);
+    }
+}
+
+void tileInvokeCancel(Tile* tile)
+{
+    if (tile != NULL/* && tile->_interactionCB != NULL*/)
+    {
+        tile->_interactionCB = tileCBTest2;
+        tile->_interactionCB(tile);
+    }
+}
+
+/// @brief Set color of tile as testing
+/// @param tile 
+/// @param color 
 void tileSetColor(Tile* tile, uint32_t color)
 {
-    //tile->color = color;
-    tile->color = color; // cast to long to match the type in the struct
+    tile->color = color;
 }
-
-void tileFillRed(Tile* tile)
-{
-
-}
-
-void tileFillGreen(Tile* tile)
-{
-}
-
-void tileFillBlue(Tile* tile)
-{
-}
-#endif
 
 
 /// @brief 

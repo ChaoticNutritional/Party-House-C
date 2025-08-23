@@ -22,7 +22,14 @@ typedef struct level_t
 
     Ball* justBall;
     Grid* grid;
+    Tile* activeTile;
 } Level;
+
+typedef struct inputContext_t
+{
+    Grid** grid;
+    uint32_t* gridIndexPtr;
+}inputContext;
 
 typedef struct p_level_t
 {
@@ -81,6 +88,55 @@ Level* levelMgrLoadNew(const LevelDef* levelDef)
 }
 
 
+/// @brief 
+/// @param level 
+/// @return 
+Level* levelUpdateCurrentTile(Level* level)
+{
+    assert(level->grid != NULL);
+
+    level->activeTile = gridGetActiveTile(level->grid);
+    return level;
+}
+
+
+
+/// Level Input Callbacks
+void onGridRight(void* ctx) {
+    Grid* g = (Grid*)ctx;
+    gridGoNextTile(g);
+}
+void onGridLeft(void* ctx) {
+    Grid* g = (Grid*)ctx;
+    gridGoLeftTile(g);
+}
+void onGridUp(void* ctx) {
+    Grid* g = (Grid*)ctx;
+    gridGoUpTile(g);
+}
+void onGridDown(void* ctx) {
+    Grid* g = (Grid*)ctx;
+    gridGoDownTile(g);
+}
+
+void onGridPrimary(void* ctx) {
+    Grid* grid = (Grid*)ctx;
+    Tile* tile = gridGetActiveTile(grid);  // current tile at press-time
+    if (tile != NULL)
+    {
+        gridPrimaryInput(tile); // see tile section below
+    }
+}
+
+void onGridSecondary(void* ctx) {
+    Grid* grid = (Grid*)ctx;
+    Tile* tile = gridGetActiveTile(grid);
+    if (tile != NULL) 
+    {
+        gridSecondaryInput(tile);
+    }
+}
+
 
 /// @brief Loads the level and all required objects/assets
 /// @param levelDef 
@@ -99,10 +155,22 @@ Level* levelMgrLoad(const LevelDef* levelDef)
         Bounds2D windowBounds = { {0.0f, 0.0f}, { (float)levelDef->windowWidth, (float)levelDef->windowHeight } };
         level->justBall = ballNew(windowBounds);
 
-        level->grid = gridNewTest(windowBounds, 5, 7, 0xFFFFFF);
+        level->grid = gridNewTest(levelDef->fieldBounds);
 
         inputSetCallback(Z_KEY, changeBallColorBlue, level->justBall);
         inputSetCallback(X_KEY, changeBallColorRed, level->justBall);
+
+        level->activeTile = gridGetActiveTile(level->grid);
+
+        //inputSetCallback(RIGHT_KEY, gridGoNextTile, level->grid);
+        //inputSetCallback(Z_KEY, gridPrimaryInput(level->grid), gridGetActiveTile(level->grid));
+        //inputSetCallback(X_KEY, gridSecondaryInput(level->grid), gridGetActiveTile(level->grid));
+        inputSetCallback(RIGHT_KEY, onGridRight, level->grid);
+        inputSetCallback(LEFT_KEY, onGridLeft, level->grid);
+        inputSetCallback(UP_KEY, onGridUp, level->grid);
+        inputSetCallback(DOWN_KEY, onGridDown, level->grid);
+        inputSetCallback(Z_KEY, onGridPrimary, level->grid);
+        inputSetCallback(X_KEY, onGridSecondary, level->grid);
     }
     return level;
 }
@@ -132,6 +200,6 @@ void levelMgrUnload(Level* level)
 
 static void _levelMgrPlaySound(Ball* ball)
 {
-    Bounds2D bounds = { {0.0f, 0.0f}, {20.0f, 20.0f} };
+    //Bounds2D bounds = { {0.0f, 0.0f}, {20.0f, 20.0f} };
     soundPlay(_soundId);
 }

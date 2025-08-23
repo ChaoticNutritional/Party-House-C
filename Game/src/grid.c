@@ -3,19 +3,22 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "gameConstDefs.h"
 #include "random.h"
 #include "tile.h"
 
 typedef struct grid_t
 {
-    //Object obj;
-
     Bounds2D bounds;       // overall bounds of the grid
     uint8_t rows;          // number of rows
     uint8_t cols;          // number of columns
-    float tileWidth;       // width of each tile
-    float tileHeight;      // height of each tile
+    uint32_t tileWidth;       // width of each tile
+    uint32_t tileHeight;      // height of each tile
     Tile** tiles;          // array of pointers to tiles
+    uint32_t currentIdx;
+    Tile* activeTile;       //
+    InteractionCB* primaryInteraction;
+    InteractionCB* secondaryInteraction;
 } Grid;
 
 
@@ -29,18 +32,11 @@ Grid* gridNew(Bounds2D bounds)
     assert(grid != NULL);
     grid->bounds = bounds;
 
-    /// making sure the bounds are within reasonable limits (what are reasonable limits?...), level defs has the application window size. This will eventually contain a panel struct definition which is limited size within the app window.
-    /// therefore, level needs to pass the panel bounds to the grid, which is the input parameter for this function
-    float _width = bounds.botRight.x / 5.0f;
-    assert((uint32_t)_width > 0 && (uint32_t)_width < 0xFFFFFF);
-    float _height = bounds.botRight.y / 7.0f;
-    assert((uint32_t)_height > 0 && (uint32_t)_height < 0xFFFFFF);
+    grid->rows = HOUSE_CELLS_HIGH;
+    grid->cols = HOUSE_CELLS_WIDE;
 
-    grid->tileWidth = bounds.botRight.x / 5.0f;
-    grid->tileHeight = bounds.botRight.y / 7.0f;
-
-    grid->rows = (uint8_t)bounds.botRight.x / (uint8_t)grid->tileWidth;
-    grid->cols = (uint8_t)bounds.botRight.y / (uint8_t)7;
+    grid->tileWidth = (uint32_t)bounds.botRight.x / HOUSE_CELLS_HIGH;
+    grid->tileHeight = (uint32_t)bounds.botRight.y / HOUSE_CELLS_WIDE;
 
     return grid;
 }
@@ -53,24 +49,27 @@ Grid* gridNew(Bounds2D bounds)
 /// @param cols - number of columns in the grid
 /// @param color - a test color to fill all tiles with
 /// @return 
-Grid* gridNewTest(const Bounds2D bounds, uint8_t rows, uint8_t cols, uint32_t color)
+Grid* gridNewTest(const Bounds2D bounds)
 {
     // ensure that rows and cols are greater than 0
-    assert(cols > 0 && rows > 0);
+    //assert(cols > 0 && rows > 0);
 
     Grid* grid = malloc(sizeof(Grid));
     assert(grid != NULL);
     grid->bounds = bounds;
+    grid->cols = HOUSE_CELLS_WIDE;
+    grid->rows = HOUSE_CELLS_HIGH;
+    grid->currentIdx = 0; // intentionally not 0 based!
 
-    // accounts for offset of bounds not at (0,0)
-    const float _width = (bounds.botRight.x - bounds.topLeft.x);  // width in pixels
-    const float _height = (bounds.botRight.y - bounds.topLeft.y); // height in pixels
+    // accounts for offset of bounds not at (0,0) GRID HEIGHT AND WIDTH
+    const uint32_t _width = (uint32_t)(bounds.botRight.x - bounds.topLeft.x);  // width in pixels
+    const uint32_t _height = (uint32_t)(bounds.botRight.y - bounds.topLeft.y); // height in pixels
 
     // calculate tile width and height based on height and width divided by desired number of rows and columns respectively
-    grid->tileWidth = _width / (float)cols;
-    grid->tileHeight = _height / (float)rows;
+    grid->tileWidth = _width / grid->cols;
+    grid->tileHeight = _height / grid->rows;
 
-    const size_t N = (size_t)rows * (size_t)cols; // total number of tiles
+    const size_t N = (size_t)grid->rows * (size_t)grid->cols; // total number of tiles
 
     // allocate space a number of tile pointers equal to rows * cols
     grid->tiles = malloc(N * sizeof(*grid->tiles));    // use *grid->tiles to stay DRY, if I change how grid->tiles is defined
@@ -82,12 +81,12 @@ Grid* gridNewTest(const Bounds2D bounds, uint8_t rows, uint8_t cols, uint32_t co
     // create new tiles and store them in the array of tiles
     for (size_t i= 0; i < N; ++i)
     {
-        size_t r = i / cols;
-        size_t c = i % cols;
+        size_t r = i / grid->cols;
+        size_t c = i % grid->cols;
 
         Coord2D tileTopCornerPos = {
-            bounds.topLeft.x + (grid->tileWidth * (float)(c)),
-            bounds.topLeft.y + (grid->tileHeight * (float)(r))
+            bounds.topLeft.x + (float)(grid->tileWidth * (c)),
+            bounds.topLeft.y + (float)(grid->tileHeight * (r))
         };
 
         Tile* t = tileNewTest(tileTopCornerPos, (uint16_t)grid->tileWidth, (uint16_t)grid->tileHeight);
@@ -102,9 +101,9 @@ Grid* gridNewTest(const Bounds2D bounds, uint8_t rows, uint8_t cols, uint32_t co
         grid->tiles[i] = t;
     }
 
+    grid->activeTile = grid->tiles[grid->currentIdx];
     return grid;
 }
-
 
 
 /// @brief Delete a grid and free up any allocated resources
@@ -117,6 +116,93 @@ void gridDelete(Grid* grid)
         tileDelete(grid->tiles[i]);
     }
 
-    //objDeinit(&grid->obj);
+    free(grid->tiles);
     free(grid);
+}
+
+
+/// @brief Primary input callback for grid interaction
+/// @param ctx the tile providing our interact context
+void gridPrimaryInput(void* ctx)
+{
+    Tile* tile =  (Tile*)ctx;
+    tileInvokeInteraction(tile);
+    //return getTileCallback(grid->activeTile);
+}
+
+/// @brief Secondary input callback for grid interaction
+/// @param ctx the tile providing our interact context
+void gridSecondaryInput(void* ctx)
+{
+    Tile* tile = (Tile*)ctx;
+    tileInvokeCancel(tile);
+    //return getTileCallback2(grid->activeTile);
+}
+
+/// @brief Move to the next tile in the grid, wrapping around if at the end
+/// @param grid
+void gridGoNextTile(Grid* grid)
+{
+    Tile* t = grid->activeTile;
+    assert(t != NULL);
+
+    const size_t N = (size_t)grid->rows * (size_t)grid->cols;
+
+    grid->currentIdx = (grid->currentIdx + 1) % N;
+    grid->activeTile = grid->tiles[grid->currentIdx];
+}
+
+/// @brief Move to previous tile in the grid, wrapping around if at the beginning
+/// @param grid 
+void gridGoLeftTile(Grid* grid)
+{
+    Tile* t = grid->activeTile;
+    assert(t != NULL);
+
+    const size_t N = (size_t)grid->rows * (size_t)grid->cols;
+    grid->currentIdx = (grid->currentIdx - 1) % N;
+    grid->activeTile = grid->tiles[grid->currentIdx];
+}
+
+/// @brief Move up one tile in the grid, wrapping around if at the top
+/// @param grid
+void gridGoUpTile(Grid* grid)
+{
+    Tile* t = grid->activeTile;
+    assert(t != NULL);
+
+    const size_t N = (size_t)grid->rows * (size_t)grid->cols;
+    grid->currentIdx = (grid->currentIdx - HOUSE_CELLS_WIDE) % N;
+    grid->activeTile = grid->tiles[grid->currentIdx];
+}
+
+/// @brief Move down one tile in the grid, wrapping around if at the bottom
+/// @param grid
+void gridGoDownTile(Grid* grid)
+{
+    Tile* t = grid->activeTile;
+    assert(t != NULL);
+
+    const size_t N = (size_t)grid->rows * (size_t)grid->cols;
+    grid->currentIdx = (grid->currentIdx + HOUSE_CELLS_WIDE) % N;
+    grid->activeTile = grid->tiles[grid->currentIdx];
+}
+
+
+
+/// @brief return the currently active tile in the grid
+Tile* gridGetActiveTile(Grid* grid)
+{
+    assert(grid->tiles[grid->currentIdx] != NULL);
+    return grid->activeTile;
+}
+
+
+
+/// @brief return some tile from grid
+/// @param gp - grid payload contains grid and tile index
+/// @return 
+Tile* gridGetTile(GridPayload gp)
+{
+    return gp.grid->tiles[gp.tileIdx];
 }

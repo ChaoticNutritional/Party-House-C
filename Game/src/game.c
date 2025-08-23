@@ -14,7 +14,11 @@ static void _gameDraw();
 static void _gameUpdate(uint32_t milliseconds);
 
 
-// array of all levels in this game
+/// @brief fwd declaration of a tile
+struct Tile;
+
+
+/// array of all levels in this game
 static LevelDef _levelDefs[] = {
     {
         {/*{0,0}, {20,20}*/{0, 0}, {974, 600}},		// fieldBounds

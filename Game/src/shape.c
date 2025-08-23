@@ -99,12 +99,11 @@ void shapeDrawRect(float LeftX, float topY, float RightX, float botY, uint8_t r,
 
 	glColor4ub(r, g, b, 0xFF);
 	// Set the point size
-	glPointSize(1.0);
+	glPointSize(1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 	glVertex2f(LeftX, topY); // upper left corner
 	glVertex2f(RightX, topY); // upper right corner
 	glVertex2f(LeftX, botY); // bottom left corner
 	glVertex2f(RightX, botY);	// bottom right corner
 	glEnd();
-
 }
