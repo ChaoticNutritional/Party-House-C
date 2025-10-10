@@ -43,13 +43,6 @@ void inputClearCallback(uint8_t keyCode);
 void inputClearAllCallbacks();
 void inputUpdate();
 
-// Default navigation
-//void navigateUp(void* ctx);
-//void navigateDown(void* ctx);
-//void navigateLeft(void* ctx);
-//void navigateRight(void* ctx);
-
-
 #ifdef __cplusplus
 }
 #endif

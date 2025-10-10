@@ -55,7 +55,7 @@ typedef struct
 
 
 /// @brief 
-static InputBinding _bindings[KEY_COUNT] = {};
+static InputBinding _bindings[KEY_COUNT];
 
 
 /// @brief Input system initialization
