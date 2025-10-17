@@ -13,9 +13,9 @@ static void _gameShutdown();
 static void _gameDraw();
 static void _gameUpdate(uint32_t milliseconds);
 
-
-/// @brief fwd declaration of a tile
-struct Tile;
+/// FPS Settings
+#define TARGET_FPS 60
+#define FRAME_TIME_MS (1000 / TARGET_FPS) // ~16.67ms
 
 
 /// array of all levels in this game
@@ -66,18 +66,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             _levelDefs->windowWidth = GetWindowWidth();
             _gameInit();
 
+            timeBeginPeriod(1);
+            DWORD lastFrameTime = GetTickCount();
+
             bool running = true;
             while (running)
             {
-                /// Get Current Window Size
-                p_fwGetWindowHeight(app);
-                p_fwGetWindowWidth(app);
+                DWORD currentTime = GetTickCount();
+                DWORD deltaTime = currentTime - lastFrameTime;
 
+                // Only update if enough time has passed
+                if (deltaTime >= FRAME_TIME_MS)
+                {
+                    /// Get Current Window Size
+                    p_fwGetWindowHeight(app);
+                    p_fwGetWindowWidth(app);
 
-
-                running = fwUpdateWindow(window);
+                    running = fwUpdateWindow(window);
+                    
+                    lastFrameTime = currentTime;
+                }
+                else
+                {
+                    // Sleep to avoid burning CPU
+                    Sleep(1);
+                }
             }
 
+            timeEndPeriod(1);
             _gameShutdown();
             fwShutdownWindow(window);
         }
