@@ -105,28 +105,28 @@ void inputMouseUpdateButton(InputButton button, bool pressed)
 
 
 /// @brief Sets callback function to execute on given button press
-/// @param keyCode 
+/// @param keyCode - enum index of key in bindings array
 /// @param cb 
 /// @param ctx 
-void inputSetCallback(GameKey key, InputCB cb, void* ctx) {
-    assert(key < KEY_COUNT);
-    _bindings[key].callback = cb;
-    _bindings[key].context = ctx;
+void inputSetCallback(uint8_t keyCode, InputCB cb, void* ctx) {
+    assert(keyCode < KEY_COUNT);
+    _bindings[keyCode].callback = cb;
+    _bindings[keyCode].context = ctx;
 }
 
 
 /// @brief - resets callback functionality to NULL for given key
-/// @param key - enum index of key in bindings array
-void inputClearCallback(GameKey key) {
-    assert(key < KEY_COUNT);
-    _bindings[key].callback = NULL;
-    _bindings[key].context = NULL;
+/// @param keyCode - enum index of key in bindings array
+void inputClearCallback(uint8_t keyCode) {
+    assert(keyCode < KEY_COUNT);
+    _bindings[keyCode].callback = NULL;
+    _bindings[keyCode].context = NULL;
 }
 
 
 
 /// @brief - resets callback functionality to NULL for all keybinds
-void inputClearAllCallbacks() {
+void inputClearAllCallbacks(void) {
     for (int i = 0; i < KEY_COUNT; ++i) {
         inputClearCallback((GameKey)i);
     }
@@ -134,7 +134,7 @@ void inputClearAllCallbacks() {
 
 
 /// @brief called every frame, iterates over list of keycodes to see if one was pressed that frame
-void inputUpdate() {
+void inputUpdate(void) {
 
     for (int i = 0; i < KEY_COUNT; ++i) {
         bool pressed = inputKeyPressed(KeyCodes[i]);

@@ -120,6 +120,11 @@ void tileInvokeCancel(Tile* tile)
     }
 }
 
+Bounds2D getTileBounds(Tile* tile)
+{
+    return tile->tileBounds;
+}
+
 /// @brief Set color of tile as testing
 /// @param tile 
 /// @param color 

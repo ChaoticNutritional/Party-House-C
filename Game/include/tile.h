@@ -16,6 +16,8 @@ void tileInvokeInteraction(Tile* tile);
 void tileInvokeCancel(Tile* tile);
 void tileClearInteractionCB(Tile* tile);
 
+Bounds2D getTileBounds(Tile* tile);
+
 /// Testing functions:
 void tileSetColor(Tile* tile, uint32_t color);
 

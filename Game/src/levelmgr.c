@@ -10,6 +10,11 @@
 #include "sound.h"
 #include "input.h"
 #include "grid.h"
+#include "selectionHandle.h"
+
+/// Note to self:
+/// implement a sound queue to kill sounds after 3 concurrent sounds exist
+/// put in its own file, include header
 
 typedef struct level_t
 {
@@ -19,12 +24,14 @@ typedef struct level_t
     Field* field;
     Ball** balls;
     Face** faces;
+    Handles* handles;
 
     Ball* justBall;
     Grid* grid;
     Tile* activeTile;
 } Level;
 
+// reference this in load new level? Get it from level def?
 typedef struct inputContext_t
 {
     Grid** grid;
@@ -41,6 +48,7 @@ typedef struct p_level_t
 } P_Level;
 
 static int32_t _soundId = SOUND_NOSOUND;
+static int32_t _interactSound = SOUND_NOSOUND;
 
 static void _levelMgrPlaySound(Ball* ball);
 
@@ -52,17 +60,20 @@ static void changeBallColorRed(void* ctx)
 }
 
 static void changeBallColorBlue(void* ctx)
-{
+{ 
     Ball* ball = (Ball*)ctx;
     ballSetColor(ball, 0x0000FF);
 }
+
 
 /// @brief Initialize the level manager
 void levelMgrInit()
 {
     faceInitTextures();
+    
 
     _soundId = soundLoad("asset/beep.wav");
+    _interactSound = soundLoad("asset/sounds/01_brnggg.ogg");
 
     // sets callback for collision 
     ballSetCollideCB(_levelMgrPlaySound);
@@ -73,6 +84,7 @@ void levelMgrShutdown()
 {
     ballClearCollideCB();
     soundUnload(_soundId);
+    soundUnload(_interactSound);
 }
 
 
@@ -102,6 +114,7 @@ Level* levelUpdateCurrentTile(Level* level)
 
 
 /// Level Input Callbacks
+/// local Grid* g because we KNOW that g is a grid, even if the compiler doesn't trust it outside the wrapper.
 void onGridRight(void* ctx) {
     Grid* g = (Grid*)ctx;
     gridGoNextTile(g);
@@ -119,11 +132,13 @@ void onGridDown(void* ctx) {
     gridGoDownTile(g);
 }
 
+
 void onGridPrimary(void* ctx) {
     Grid* grid = (Grid*)ctx;
     Tile* tile = gridGetActiveTile(grid);  // current tile at press-time
     if (tile != NULL)
     {
+        soundPlay(_interactSound);
         gridPrimaryInput(tile); // see tile section below
     }
 }
@@ -133,6 +148,7 @@ void onGridSecondary(void* ctx) {
     Tile* tile = gridGetActiveTile(grid);
     if (tile != NULL) 
     {
+        soundPlay(_interactSound);
         gridSecondaryInput(tile);
     }
 }
@@ -150,25 +166,24 @@ Level* levelMgrLoad(const LevelDef* levelDef)
 
         // the field provides the boundaries of the scene & encloses the faces & balls
         level->field = fieldNew(levelDef->fieldBounds, levelDef->fieldColor);
-
-        /*level->justBall = malloc(sizeof(Ball*));*/
+        
         Bounds2D windowBounds = { {0.0f, 0.0f}, { (float)levelDef->windowWidth, (float)levelDef->windowHeight } };
         level->justBall = ballNew(windowBounds);
 
         level->grid = gridNewTest(levelDef->fieldBounds);
-
-        inputSetCallback(Z_KEY, changeBallColorBlue, level->justBall);
-        inputSetCallback(X_KEY, changeBallColorRed, level->justBall);
-
         level->activeTile = gridGetActiveTile(level->grid);
 
-        //inputSetCallback(RIGHT_KEY, gridGoNextTile, level->grid);
-        //inputSetCallback(Z_KEY, gridPrimaryInput(level->grid), gridGetActiveTile(level->grid));
-        //inputSetCallback(X_KEY, gridSecondaryInput(level->grid), gridGetActiveTile(level->grid));
+        // level->handles = ne
+
+        level->handles = handlesNew(getATileBounds(level->grid), level->grid);
+        
+        // directional keybinds
         inputSetCallback(RIGHT_KEY, onGridRight, level->grid);
         inputSetCallback(LEFT_KEY, onGridLeft, level->grid);
         inputSetCallback(UP_KEY, onGridUp, level->grid);
         inputSetCallback(DOWN_KEY, onGridDown, level->grid);
+
+        // primary/secondary keys
         inputSetCallback(Z_KEY, onGridPrimary, level->grid);
         inputSetCallback(X_KEY, onGridSecondary, level->grid);
     }

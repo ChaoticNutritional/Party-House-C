@@ -120,6 +120,11 @@ void gridDelete(Grid* grid)
     free(grid);
 }
 
+Bounds2D getATileBounds(const Grid* grid)
+{
+    return getTileBounds(grid->tiles[0]);
+}
+
 
 /// @brief Primary input callback for grid interaction
 /// @param ctx the tile providing our interact context

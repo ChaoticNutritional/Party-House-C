@@ -40,8 +40,8 @@ typedef enum
 typedef void (*InputCB)(void* ctx);
 void inputSetCallback(uint8_t keyCode, InputCB cb, void* ctx);
 void inputClearCallback(uint8_t keyCode);
-void inputClearAllCallbacks();
-void inputUpdate();
+void inputClearAllCallbacks(void);
+void inputUpdate(void);
 
 #ifdef __cplusplus
 }

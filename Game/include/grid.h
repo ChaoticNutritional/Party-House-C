@@ -24,6 +24,8 @@ Grid* gridNewTest(const Bounds2D bounds);
 void gridDelete(Grid* grid);
 
 
+Bounds2D getATileBounds(const Grid* grid);
+    
 // Input Callbacks
 void gridPrimaryInput(void* ctx);
 void gridSecondaryInput(void* ctx);

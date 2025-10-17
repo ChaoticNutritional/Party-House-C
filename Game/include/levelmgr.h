@@ -14,6 +14,7 @@ extern "C" {
         uint32_t numFaces;
         uint32_t windowHeight;
         uint32_t windowWidth;
+        Bounds2D canvasBounds;  
     } LevelDef;
 
     typedef struct p_levelDef_t
