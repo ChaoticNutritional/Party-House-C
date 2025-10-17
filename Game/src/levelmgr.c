@@ -52,31 +52,31 @@ static int32_t _interactSound = SOUND_NOSOUND;
 
 static void _levelMgrPlaySound(Ball* ball);
 
-/// DEMO KEYBIND CALLBACKS
-static void changeBallColorRed(void* ctx)
-{
-    Ball* ball = (Ball*)ctx;
-    ballSetColor(ball, 0xFF0000);
-}
-
-static void changeBallColorBlue(void* ctx)
-{ 
-    Ball* ball = (Ball*)ctx;
-    ballSetColor(ball, 0x0000FF);
-}
+// /// DEMO KEYBIND CALLBACKS
+// static void changeBallColorRed(void* ctx)
+// {
+//     Ball* ball = (Ball*)ctx;
+//     ballSetColor(ball, 0xFF0000);
+// }
+//
+// static void changeBallColorBlue(void* ctx)
+// { 
+//     Ball* ball = (Ball*)ctx;
+//     ballSetColor(ball, 0x0000FF);
+// }
 
 
 /// @brief Initialize the level manager
 void levelMgrInit()
 {
-    faceInitTextures();
+    // faceInitTextures();
     
 
-    _soundId = soundLoad("asset/beep.wav");
+    // _soundId = soundLoad("asset/beep.wav");
     _interactSound = soundLoad("asset/sounds/01_brnggg.ogg");
 
     // sets callback for collision 
-    ballSetCollideCB(_levelMgrPlaySound);
+    // ballSetCollideCB(_levelMgrPlaySound);
 }
 
 /// @brief Shutdown the level manager
@@ -166,9 +166,9 @@ Level* levelMgrLoad(const LevelDef* levelDef)
 
         // the field provides the boundaries of the scene & encloses the faces & balls
         level->field = fieldNew(levelDef->fieldBounds, levelDef->fieldColor);
-        
+
         Bounds2D windowBounds = { {0.0f, 0.0f}, { (float)levelDef->windowWidth, (float)levelDef->windowHeight } };
-        level->justBall = ballNew(windowBounds);
+        level->justBall = ballNew(windowBounds); /// BUG: The ball is load bearing and removing this makes the grid not render 
 
         level->grid = gridNewTest(levelDef->fieldBounds);
         level->activeTile = gridGetActiveTile(level->grid);
