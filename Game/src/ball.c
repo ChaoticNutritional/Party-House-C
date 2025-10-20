@@ -114,7 +114,6 @@ static void _ballDraw(Object* obj)
 	bool filledVal = true;
 
 	shapeDrawCircle(ball->radius, ball->obj.position.x, ball->obj.position.y, red, green, blue, filledVal);
-	shapeDrawRect(50.0f, 50.0f, 75.0f, 75.0f, red, green, blue, filledVal);
 }
 
 static void _ballDoCollisions(Ball* ball)

@@ -22,11 +22,8 @@ typedef struct level_t
     //p_LevelDef* p_def;
 
     Field* field;
-    Ball** balls;
-    Face** faces;
     Handles* handles;
 
-    Ball* justBall;
     Grid* grid;
     Tile* activeTile;
 } Level;
@@ -72,11 +69,11 @@ void levelMgrInit()
     // faceInitTextures();
     
 
-    // _soundId = soundLoad("asset/beep.wav");
+    _soundId = soundLoad("asset/beep.wav");
     _interactSound = soundLoad("asset/sounds/01_brnggg.ogg");
 
     // sets callback for collision 
-    // ballSetCollideCB(_levelMgrPlaySound);
+    ballSetCollideCB(_levelMgrPlaySound);
 }
 
 /// @brief Shutdown the level manager
@@ -167,14 +164,9 @@ Level* levelMgrLoad(const LevelDef* levelDef)
         // the field provides the boundaries of the scene & encloses the faces & balls
         level->field = fieldNew(levelDef->fieldBounds, levelDef->fieldColor);
 
-        Bounds2D windowBounds = { {0.0f, 0.0f}, { (float)levelDef->windowWidth, (float)levelDef->windowHeight } };
-        level->justBall = ballNew(windowBounds); /// BUG: The ball is load bearing and removing this makes the grid not render 
-
         level->grid = gridNewTest(levelDef->fieldBounds);
+
         level->activeTile = gridGetActiveTile(level->grid);
-
-        // level->handles = ne
-
         level->handles = handlesNew(getATileBounds(level->grid), level->grid);
         
         // directional keybinds
@@ -196,18 +188,8 @@ void levelMgrUnload(Level* level)
 {
     if (level != NULL) 
     {
-        for (uint32_t i = 0; i < level->def->numFaces * level->def->numFaces; ++i)
-        {
-            faceDelete(level->faces[i]);
-        }
-        free(level->faces);
-
-        for (uint32_t i = 0; i < level->def->numBalls; ++i)
-        {
-            ballDelete(level->balls[i]);
-        }
-        free(level->balls);
-
+        gridDelete(level->grid);
+        handlesDelete(level->handles);
         fieldDelete(level->field);
     }
     free(level);

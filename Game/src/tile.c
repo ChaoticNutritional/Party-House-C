@@ -153,7 +153,7 @@ void _tileDraw(Object* obj)
         tile->tileBounds.botRight.x, 
         tile->tileBounds.botRight.y, 
         red, green, blue, 
-        filledVal);
+        false);
 }
 
 /// @brief 

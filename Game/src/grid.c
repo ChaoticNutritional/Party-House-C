@@ -41,6 +41,39 @@ Grid* gridNew(Bounds2D bounds)
     return grid;
 }
 
+void initTiles(Grid* grid)
+{
+    const size_t N = (size_t)grid->rows * (size_t)grid->cols; // total number of tiles
+
+    // allocate space a number of tile pointers equal to rows * cols
+    grid->tiles = malloc(N * sizeof(*grid->tiles));    // use *grid->tiles to stay DRY, if I change how grid->tiles is defined
+    assert(grid->tiles != NULL);
+    
+    Bounds2D bounds = grid->bounds;
+    // create new tiles and store them in the array of tiles
+    for (size_t i= 0; i < N; ++i)
+    {
+        size_t r = i / grid->cols;
+        size_t c = i % grid->cols;
+
+        Coord2D tileTopCornerPos = {
+            bounds.topLeft.x + (float)(grid->tileWidth * (c)),
+            bounds.topLeft.y + (float)(grid->tileHeight * (r))
+        };
+
+        Tile* t = tileNewTest(tileTopCornerPos, (uint16_t)grid->tileWidth, (uint16_t)grid->tileHeight);
+        assert(t != NULL);
+        // if t is NULL, then we should cleanup any created tiles before failing
+
+        uint32_t randColor = randGetInt(0, 256);
+        randColor += randGetInt(0, 256) << 8; // shift left by 8 bits to get green
+        randColor += randGetInt(0, 256) << 16; // shift left by 16 bits to get red
+
+        tileSetColor(t, randColor);
+        grid->tiles[i] = t;
+    }
+}
+
 
 
 /// @brief Should create and return a new grid
@@ -68,38 +101,9 @@ Grid* gridNewTest(const Bounds2D bounds)
     // calculate tile width and height based on height and width divided by desired number of rows and columns respectively
     grid->tileWidth = _width / grid->cols;
     grid->tileHeight = _height / grid->rows;
-
-    const size_t N = (size_t)grid->rows * (size_t)grid->cols; // total number of tiles
-
-    // allocate space a number of tile pointers equal to rows * cols
-    grid->tiles = malloc(N * sizeof(*grid->tiles));    // use *grid->tiles to stay DRY, if I change how grid->tiles is defined
-    assert(grid->tiles != NULL);
-
-    // register the grid as an object
-    //objInit(&grid->obj, NULL, bounds.topLeft, (Coord2D) { 0, 0 });
-
-    // create new tiles and store them in the array of tiles
-    for (size_t i= 0; i < N; ++i)
-    {
-        size_t r = i / grid->cols;
-        size_t c = i % grid->cols;
-
-        Coord2D tileTopCornerPos = {
-            bounds.topLeft.x + (float)(grid->tileWidth * (c)),
-            bounds.topLeft.y + (float)(grid->tileHeight * (r))
-        };
-
-        Tile* t = tileNewTest(tileTopCornerPos, (uint16_t)grid->tileWidth, (uint16_t)grid->tileHeight);
-        assert(t != NULL);
-        // if t is NULL, then we should cleanup any created tiles before failing
-
-        uint32_t randColor = randGetInt(0, 256);
-        randColor += randGetInt(0, 256) << 8; // shift left by 8 bits to get green
-        randColor += randGetInt(0, 256) << 16; // shift left by 16 bits to get red
-
-        tileSetColor(t, randColor);
-        grid->tiles[i] = t;
-    }
+    
+    // init tiles:
+    initTiles(grid);
 
     grid->activeTile = grid->tiles[grid->currentIdx];
     return grid;
@@ -165,7 +169,7 @@ void gridGoLeftTile(Grid* grid)
     assert(t != NULL);
 
     const size_t N = (size_t)grid->rows * (size_t)grid->cols;
-    grid->currentIdx = (grid->currentIdx - 1) % N;
+    grid->currentIdx = (grid->currentIdx + N - 1) % N;  // Fixed
     grid->activeTile = grid->tiles[grid->currentIdx];
 }
 
@@ -177,9 +181,11 @@ void gridGoUpTile(Grid* grid)
     assert(t != NULL);
 
     const size_t N = (size_t)grid->rows * (size_t)grid->cols;
-    grid->currentIdx = (grid->currentIdx - HOUSE_CELLS_WIDE) % N;
+    grid->currentIdx = (grid->currentIdx + N - grid->cols) % N;
     grid->activeTile = grid->tiles[grid->currentIdx];
 }
+
+
 
 /// @brief Move down one tile in the grid, wrapping around if at the bottom
 /// @param grid

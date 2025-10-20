@@ -19,6 +19,7 @@ const float DEG2RAD = 3.14159f/180.0f;
 /// @param filled solid circle, if true, outline otherwise
 void shapeDrawCircle(float radius, float x, float y, uint8_t r, uint8_t g, uint8_t b, bool filled)
 {	
+
 	glEnable(GL_POINT_SMOOTH);
 	glDisable(GL_TEXTURE_2D);
 	if(!filled)
@@ -40,9 +41,9 @@ void shapeDrawCircle(float radius, float x, float y, uint8_t r, uint8_t g, uint8
 	}
 	else
 	{
-	 //   glColor4ub(r, g, b, 0xFF);
-		//glEnable(GL_BLEND); 
-	 //   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		//   glColor4ub(r, g, b, 0xFF);
+		//	 glEnable(GL_BLEND); 
+		//   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 		//glPointSize(radius * 2);
 		//glBegin(GL_POINTS);
 		//glVertex2f(x, y);
@@ -61,6 +62,7 @@ void shapeDrawCircle(float radius, float x, float y, uint8_t r, uint8_t g, uint8
 		}
 		glEnd();
 	}
+	glDisable(GL_POINT_SMOOTH);
 }
 
 /// @brief Draws a line to the screen with the given properties
@@ -96,14 +98,17 @@ void shapeDrawLine(float startX, float startY, float endX, float endY, uint8_t r
 void shapeDrawRect(float LeftX, float topY, float RightX, float botY, uint8_t r, uint8_t g, uint8_t b, bool filled)
 {
 	glDisable(GL_TEXTURE_2D);
-
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4ub(r, g, b, 0xFF);
-	// Set the point size
-	glPointSize(1.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glVertex2f(LeftX, topY); // upper left corner
-	glVertex2f(RightX, topY); // upper right corner
-	glVertex2f(LeftX, botY); // bottom left corner
-	glVertex2f(RightX, botY);	// bottom right corner
+    
+	glBegin(GL_TRIANGLE_STRIP); 
+	glVertex2f(LeftX, topY);   // v0: top-left
+	glVertex2f(LeftX, botY);   // v2: bottom-left
+	glVertex2f(RightX, topY);  // v1: top-right
+	glVertex2f(RightX, botY);  // v3: bottom-right
 	glEnd();
 }
+
+
