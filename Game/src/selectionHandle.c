@@ -1,4 +1,3 @@
-
 #include <Windows.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -17,12 +16,10 @@ typedef struct handles_t
 {
     Object      obj;
     Coord2D     size;
-    Coord2D     position;
     Grid*        grid;
 } Handles;
 
 static GLuint _handlesTexture = 0;
-static bool _inited = false;
 
 // the object vtable for all handless
 static void _handlesUpdate(Object* obj, uint32_t milliseconds);
@@ -39,6 +36,9 @@ void handlesInitTextures()
     {
         _handlesTexture = SOIL_load_OGL_texture(SELECTION_PAGE, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
             SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+        glBindTexture(GL_TEXTURE_2D, _handlesTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         assert(_handlesTexture != 0);
     }
 }
@@ -48,11 +48,7 @@ void handlesInitTextures()
 /// @return 
 Handles* handlesNew(Bounds2D box, Grid* grid)
 {
-    if (!_inited)
-    {
-        handlesInitTextures();
-        _inited = true;
-    }
+    handlesInitTextures();
     Handles* handles = malloc(sizeof(Handles));
     if (handles != NULL)
     {
@@ -84,17 +80,16 @@ static void _handlesDraw(Object* obj)
 {
     Handles* handles = (Handles*)obj;
 
-    handles->position = getTileBounds(gridGetActiveTile(handles->grid)).topLeft;
+    obj->position = getTileBounds(gridGetActiveTile(handles->grid)).topLeft;
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _handlesTexture);
     glBegin(GL_TRIANGLE_STRIP);
     {
         // calculate the bounding box
-        GLfloat xPositionLeft = (handles->position.x);
-        GLfloat xPositionRight = (handles->position.x + (handles->size.x));
-        GLfloat yPositionTop = (handles->position.y);
-        GLfloat yPositionBottom = (handles->position.y + (handles->size.y));
+        GLfloat xPositionLeft = (obj->position.x);
+        GLfloat xPositionRight = (obj->position.x + (handles->size.x));
+        GLfloat yPositionTop = (obj->position.y);
+        GLfloat yPositionBottom = (obj->position.y + (handles->size.y));
 
         // // calculate the starting uv... remember v of 0 is the bottom of the texture
         // GLfloat xTextureCoord = handles->character * uPerChar;

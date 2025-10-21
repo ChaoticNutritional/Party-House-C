@@ -45,12 +45,11 @@ Tile* tileNew(Guest* guest, void* interactCB)
 {
 	Tile* tile = malloc(sizeof(Tile));
     assert(tile != NULL);
-
 	return tile;
 }
 
 
-/// @brief 
+/// @brief temp usage to create a tile
 /// @param topLeftStart - screen coordinate of the top-left corner of the tile
 /// @param width
 /// @param height 
@@ -81,10 +80,8 @@ Tile* tileNewTest(Coord2D topLeftStart, float width, float height)
 void tileDelete(Tile* tile)
 {
     objDeinit(&tile->obj);
-
     free(tile);
 }
-
 
 
 void tileCBTest(Tile* tile)
@@ -120,10 +117,12 @@ void tileInvokeCancel(Tile* tile)
     }
 }
 
+/// easier getter
 Bounds2D getTileBounds(Tile* tile)
 {
     return tile->tileBounds;
 }
+
 
 /// @brief Set color of tile as testing
 /// @param tile 

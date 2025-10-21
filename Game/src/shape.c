@@ -41,13 +41,6 @@ void shapeDrawCircle(float radius, float x, float y, uint8_t r, uint8_t g, uint8
 	}
 	else
 	{
-		//   glColor4ub(r, g, b, 0xFF);
-		//	 glEnable(GL_BLEND); 
-		//   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-		//glPointSize(radius * 2);
-		//glBegin(GL_POINTS);
-		//glVertex2f(x, y);
-		//glEnd();
 		glDisable(GL_CULL_FACE);
 		glColor4ub(r, g, b, 0xFF);
 		glEnable(GL_BLEND);

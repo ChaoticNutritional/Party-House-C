@@ -110,33 +110,14 @@ Level* levelUpdateCurrentTile(Level* level)
 
 
 
-/// Level Input Callbacks
-/// local Grid* g because we KNOW that g is a grid, even if the compiler doesn't trust it outside the wrapper.
-void onGridRight(void* ctx) {
-    Grid* g = (Grid*)ctx;
-    gridGoNextTile(g);
-}
-void onGridLeft(void* ctx) {
-    Grid* g = (Grid*)ctx;
-    gridGoLeftTile(g);
-}
-void onGridUp(void* ctx) {
-    Grid* g = (Grid*)ctx;
-    gridGoUpTile(g);
-}
-void onGridDown(void* ctx) {
-    Grid* g = (Grid*)ctx;
-    gridGoDownTile(g);
-}
-
-
+/// @brief Level wrappers for primary/secondary inputs. Incorporate the tile's behavior and also call sound effect
 void onGridPrimary(void* ctx) {
     Grid* grid = (Grid*)ctx;
-    Tile* tile = gridGetActiveTile(grid);  // current tile at press-time
+    Tile* tile = gridGetActiveTile(grid);
     if (tile != NULL)
     {
         soundPlay(_interactSound);
-        gridPrimaryInput(tile); // see tile section below
+        gridPrimaryInput(tile);
     }
 }
 
@@ -170,10 +151,10 @@ Level* levelMgrLoad(const LevelDef* levelDef)
         level->handles = handlesNew(getATileBounds(level->grid), level->grid);
         
         // directional keybinds
-        inputSetCallback(RIGHT_KEY, onGridRight, level->grid);
-        inputSetCallback(LEFT_KEY, onGridLeft, level->grid);
-        inputSetCallback(UP_KEY, onGridUp, level->grid);
-        inputSetCallback(DOWN_KEY, onGridDown, level->grid);
+        inputSetCallback(RIGHT_KEY, gridGoNextTile, level->grid);
+        inputSetCallback(LEFT_KEY, gridGoPrevTile, level->grid);
+        inputSetCallback(UP_KEY, gridGoUpTile, level->grid);
+        inputSetCallback(DOWN_KEY, gridGoDownTile, level->grid);
 
         // primary/secondary keys
         inputSetCallback(Z_KEY, onGridPrimary, level->grid);

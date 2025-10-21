@@ -83,12 +83,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     p_fwGetWindowWidth(app);
 
                     running = fwUpdateWindow(window);
-                    
                     lastFrameTime = currentTime;
                 }
                 else
                 {
-                    // Sleep to avoid burning CPU
                     Sleep(1);
                 }
             }
