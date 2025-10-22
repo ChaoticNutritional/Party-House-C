@@ -21,8 +21,6 @@ Bounds2D getTileBounds(Tile* tile);
 /// Testing functions:
 void tileSetColor(Tile* tile, uint32_t color);
 
-//InteractionCB tileGetInteractionCB(Tile* tile);
-
 /// Testing
 void* getTileCallback(Tile* tile);
 void* getTileCallback2(Tile* tile);

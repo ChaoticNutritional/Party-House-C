@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <gl/GLU.h>
-#include "SOIL.h"
 
 #include "baseTypes.h"
 #include "Object.h"
 #include "selectionHandle.h"
 #include "tile.h"
+#include "visibleObject.h"
 
 // all of these values are based upon the layout of the PNG
 static const char SELECTION_PAGE[] = "asset/selector.png";    // rename this probably for clarity
@@ -15,6 +15,7 @@ static const char SELECTION_PAGE[] = "asset/selector.png";    // rename this pro
 typedef struct handles_t
 {
     Object      obj;
+    VisibleObject visObj;
     Coord2D     size;
     Grid*        grid;
 } Handles;
@@ -29,32 +30,19 @@ static ObjVtable _handlesVtable = {
     _handlesUpdate
 };
 
-/// @brief one time initialization of textures
-void handlesInitTextures()
-{
-    if (_handlesTexture == 0)
-    {
-        _handlesTexture = SOIL_load_OGL_texture(SELECTION_PAGE, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID,
-            SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-        glBindTexture(GL_TEXTURE_2D, _handlesTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        assert(_handlesTexture != 0);
-    }
-}
 
 /// @brief Allocates & initializes a handles object
 /// @param box 
 /// @return 
 Handles* handlesNew(Bounds2D box, Grid* grid)
 {
-    handlesInitTextures();
     Handles* handles = malloc(sizeof(Handles));
     if (handles != NULL)
     {
         Coord2D center = boundsGetCenter(&box);
         Coord2D vel = { 0.0f, 0.0f };
         objInit(&handles->obj, &_handlesVtable, center, vel);
+        visObjInit(&handles->visObj, SELECTION_PAGE, _handlesTexture);
 
         // extract the dimensions from the bounding box for rendering
         handles->size = boundsGetDimensions(&box);
@@ -69,7 +57,6 @@ Handles* handlesNew(Bounds2D box, Grid* grid)
 void handlesDelete(Handles* handles)
 {
     objDeinit(&handles->obj);
-
     free(handles);
 }
 
@@ -90,10 +77,6 @@ static void _handlesDraw(Object* obj)
         GLfloat xPositionRight = (obj->position.x + (handles->size.x));
         GLfloat yPositionTop = (obj->position.y);
         GLfloat yPositionBottom = (obj->position.y + (handles->size.y));
-
-        // // calculate the starting uv... remember v of 0 is the bottom of the texture
-        // GLfloat xTextureCoord = handles->character * uPerChar;
-        // GLfloat yTextureCoord = (MOOD_COUNT - handles->mood) * vPerMood;
 
         // const float BG_DEPTH = -0.99f;
         const float OVERLAY_DEPTH = 0.99f;

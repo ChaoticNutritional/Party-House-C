@@ -8,7 +8,7 @@ extern "C" {
 
     typedef struct handles_t Handles;
 
-    void handlesInitTextures(void);
+    // void handlesInitTextures(void);
     Handles* handlesNew(Bounds2D box, Grid* grid);
     void handlesDelete(Handles* handles);
     
