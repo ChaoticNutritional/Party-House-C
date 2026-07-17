@@ -1,7 +1,6 @@
 #pragma once
 
 #include "baseTypes.h"
-#include "object.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +17,7 @@ typedef struct gridPayload_t
 
 Grid* gridNew(Bounds2D bounds);
 
-Grid* gridNewTest(const Bounds2D bounds);
+Grid* gridInit(const Bounds2D bounds);
 void gridDelete(Grid* grid);
 
 
@@ -31,6 +30,7 @@ void gridGoNextTile(void* grid);
 void gridGoPrevTile(void* grid); 
 void gridGoUpTile(void* grid); 
 void gridGoDownTile(void* grid); 
+void expandGrid(void* grid);
 
 
 Tile* gridGetActiveTile(const Grid* grid);

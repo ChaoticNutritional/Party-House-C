@@ -79,13 +79,13 @@ void initTiles(Grid* grid)
 
 
 
-/// @brief Should create and return a new grid
+/// @brief Should create and return a new grid, currently not supporting customizable grid shapes after construction.
 /// @param bounds - panel bounds to create the grid within, passed by LevelDef->WindowHeight and Width
 /// @param rows - number of rows in the grid
 /// @param cols - number of columns in the grid
 /// @param color - a test color to fill all tiles with
 /// @return 
-Grid* gridNewTest(const Bounds2D bounds)
+Grid* gridInit(const Bounds2D bounds)
 {
     // ensure that rows and cols are greater than 0
     //assert(cols > 0 && rows > 0);
@@ -108,8 +108,8 @@ Grid* gridNewTest(const Bounds2D bounds)
     grid->tileHeight = _height / grid->rows;
 
     // init tiles:
-    initTiles(grid);
 
+    initTiles(grid);
     grid->activeTile = grid->tiles[grid->currentIdx];
     return grid;
 }

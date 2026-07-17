@@ -48,8 +48,8 @@ extern "C" {
     typedef struct textbox_t TextBox;
     typedef struct p_level_t PartyLevel;
 
-    void levelMgrInit();
-    void levelMgrShutdown();
+    void levelMgrInit(void);
+    void levelMgrShutdown(void);
     Level* levelMgrLoad(const LevelDef* levelDef);
     void levelMgrUnload(Level* level);
 

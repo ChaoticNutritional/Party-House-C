@@ -79,7 +79,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include; ../OpenGLFramework/include/; ../Game/include/**; </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include; ../OpenGLFramework/include/; /Game/include/; </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -100,7 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include/;../OpenGLFramework/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include; ../OpenGLFramework/include/; ../../Game/include/; </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -157,8 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ball.c" />
-    <ClCompile Include="src\face.c" />
+    <ClCompile Include="src\cardBehavior.c" />
     <ClCompile Include="src\field.c" />
     <ClCompile Include="src\game.c" />
     <ClCompile Include="src\grid.c">
@@ -796,10 +795,9 @@
       <AdditionalIncludeDirectories>include/;../OpenGLFramework/include/</AdditionalIncludeDirectories>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="src\visibleObject.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ball.h" />
-    <ClInclude Include="include\face.h" />
     <ClInclude Include="include\field.h" />
     <ClInclude Include="include\gameConstDefs.h" />
     <ClInclude Include="include\grid.h" />
@@ -808,11 +806,14 @@
     <ClInclude Include="include\levelmgr.h" />
     <ClInclude Include="include\object.h" />
     <ClInclude Include="include\objmgr.h" />
+    <ClInclude Include="include\partyGuest.h" />
     <ClInclude Include="include\random.h" />
     <ClInclude Include="include\renderTools.h" />
     <ClInclude Include="include\selectionHandle.h" />
     <ClInclude Include="include\shape.h" />
+    <ClInclude Include="include\textureSystem.h" />
     <ClInclude Include="include\tile.h" />
+    <ClInclude Include="include\visibleObject.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="asset\connectionmap.xml" />
@@ -837,6 +838,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="asset\base_card.png" />
+    <Content Include="asset\Eye-Sheet.png" />
     <Content Include="asset\selector.png" />
     <Content Include="asset\Sounds\01_brnggg.ogg" />
     <Content Include="asset\Sounds\01_melodic_brng.ogg" />

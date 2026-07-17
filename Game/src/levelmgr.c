@@ -5,8 +5,7 @@
 #include "baseTypes.h"
 #include "levelmgr.h"
 #include "field.h"
-#include "ball.h"
-#include "face.h"
+
 #include "sound.h"
 #include "input.h"
 #include "grid.h"
@@ -38,16 +37,20 @@ typedef struct inputContext_t
 typedef struct p_level_t
 {
     P_LevelDef* def;
-    //UIPanelDef* panels;
-    //TextBoxDef* textboxes;
-    Grid* grid;           // grid of cells for the party level
-
+    
+    /* previous chunk
+    // UIPanelDef* panels;
+    // TextBoxDef* textboxes;
+    // grid of cells for the party level
+    */  
+    
+    Grid* grid;           
 } P_Level;
 
 static int32_t _soundId = SOUND_NOSOUND;
 static int32_t _interactSound = SOUND_NOSOUND;
 
-static void _levelMgrPlaySound(Ball* ball);
+// static void _levelMgrPlaySound(Ball* ball);
 
 // /// DEMO KEYBIND CALLBACKS
 // static void changeBallColorRed(void* ctx)
@@ -64,7 +67,7 @@ static void _levelMgrPlaySound(Ball* ball);
 
 
 /// @brief Initialize the level manager
-void levelMgrInit()
+void levelMgrInit(void)
 {
     // faceInitTextures();
     
@@ -73,13 +76,14 @@ void levelMgrInit()
     _interactSound = soundLoad("asset/sounds/01_brnggg.ogg");
 
     // sets callback for collision 
-    ballSetCollideCB(_levelMgrPlaySound);
+    // ballSetCollideCB(_levelMgrPlaySound);
 }
 
+
 /// @brief Shutdown the level manager
-void levelMgrShutdown()
+void levelMgrShutdown(void)
 {
-    ballClearCollideCB();
+    // ballClearCollideCB();
     soundUnload(_soundId);
     soundUnload(_interactSound);
 }
@@ -109,7 +113,7 @@ Level* levelUpdateCurrentTile(Level* level)
 }
 
 
-
+/// It feels weird that these are in this file... I'd like to move them eventually ///
 /// @brief Level wrappers for primary/secondary inputs. Incorporate the tile's behavior and also call sound effect
 void onGridPrimary(void* ctx) {
     Grid* grid = (Grid*)ctx;
@@ -121,6 +125,7 @@ void onGridPrimary(void* ctx) {
     }
 }
 
+
 void onGridSecondary(void* ctx) {
     Grid* grid = (Grid*)ctx;
     Tile* tile = gridGetActiveTile(grid);
@@ -130,6 +135,8 @@ void onGridSecondary(void* ctx) {
         gridSecondaryInput(tile);
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 
 /// @brief Loads the level and all required objects/assets
@@ -145,7 +152,7 @@ Level* levelMgrLoad(const LevelDef* levelDef)
         // the field provides the boundaries of the scene & encloses the faces & balls
         level->field = fieldNew(levelDef->fieldBounds, levelDef->fieldColor);
 
-        level->grid = gridNewTest(levelDef->fieldBounds);
+        level->grid = gridInit(levelDef->fieldBounds);
 
         level->activeTile = gridGetActiveTile(level->grid);
         level->handles = handlesNew(getATileBounds(level->grid), level->grid);
@@ -174,10 +181,4 @@ void levelMgrUnload(Level* level)
         fieldDelete(level->field);
     }
     free(level);
-}
-
-static void _levelMgrPlaySound(Ball* ball)
-{
-    //Bounds2D bounds = { {0.0f, 0.0f}, {20.0f, 20.0f} };
-    soundPlay(_soundId);
 }

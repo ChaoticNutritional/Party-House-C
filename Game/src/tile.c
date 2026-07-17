@@ -13,7 +13,7 @@ typedef struct tile_t
     Object obj; // hold space for an object
     Bounds2D tileBounds;    // bounds of tile
     uint32_t color;
-    InteractionCB _interactionCB;
+    InteractionCB _interactionCB;  // bind function to a Tile*
 } Tile;
 
 /// For future reference using character details
@@ -39,15 +39,6 @@ static ObjVtable _tileVtable = {
     _tileDraw,
     _tileUpdate
 };
-
-/// Ctor
-Tile* tileNew(Guest* guest, void* interactCB)
-{
-	Tile* tile = malloc(sizeof(Tile));
-    assert(tile != NULL);
-	return tile;
-}
-
 
 /// @brief temp usage to create a tile
 /// @param topLeftStart - screen coordinate of the top-left corner of the tile
