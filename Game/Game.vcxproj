@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cardBehavior.c" />
+    <ClCompile Include="src\Guest.c" />
     <ClCompile Include="src\field.c" />
     <ClCompile Include="src\game.c" />
     <ClCompile Include="src\grid.c">
@@ -239,7 +240,6 @@
       <AdditionalIncludeDirectories>include/;../OpenGLFramework/include/</AdditionalIncludeDirectories>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
-    <ClCompile Include="src\guest.c" />
     <ClCompile Include="src\inputcontext.c">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -798,15 +798,14 @@
     <ClCompile Include="src\visibleObject.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Guest.h" />
     <ClInclude Include="include\field.h" />
     <ClInclude Include="include\gameConstDefs.h" />
     <ClInclude Include="include\grid.h" />
-    <ClInclude Include="include\guest.h" />
     <ClInclude Include="include\inputcontext.h" />
     <ClInclude Include="include\levelmgr.h" />
     <ClInclude Include="include\object.h" />
     <ClInclude Include="include\objmgr.h" />
-    <ClInclude Include="include\partyGuest.h" />
     <ClInclude Include="include\random.h" />
     <ClInclude Include="include\renderTools.h" />
     <ClInclude Include="include\selectionHandle.h" />

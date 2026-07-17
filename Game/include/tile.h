@@ -1,11 +1,11 @@
 #pragma once
-
-#include "guest.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct tile_t Tile;
 
 /// new and delete
-Tile* tileNew(Guest* guest, void* interactCB);
 Tile* tileNewTest(Coord2D topLeftStart, float width, float height);
 void tileDelete(Tile* tile);
 
@@ -20,3 +20,7 @@ Bounds2D getTileBounds(Tile* tile);
 
 /// Testing functions:
 void tileSetColor(Tile* tile, uint32_t color);
+    
+#ifdef __cplusplus
+}
+#endif

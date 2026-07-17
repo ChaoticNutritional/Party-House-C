@@ -52,6 +52,8 @@ Handles* handlesNew(Bounds2D box, Grid* grid)
     return handles;
 }
 
+
+
 /// @brief Frees up resources from a handles object
 /// @param handles 
 void handlesDelete(Handles* handles)
