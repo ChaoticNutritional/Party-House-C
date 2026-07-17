@@ -1,11 +1,12 @@
 #pragma once
 #include "object.h"
-#include "tile.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+    typedef void (*InteractionCB)(guest*);
     
     typedef struct guest_data_t {
         const char* name;
@@ -29,6 +30,7 @@ extern "C" {
     
     guest* guestNew(const guest_data* data);
     void guestDelete(guest* c);
+    
     
 #ifdef __cplusplus
 }

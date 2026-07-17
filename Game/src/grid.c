@@ -4,8 +4,8 @@
 #include <stdlib.h>
 
 #include "gameConstDefs.h"
-#include "random.h"
 #include "tile.h"
+#include "Guest.h"
 
 typedef struct grid_t
 {
@@ -18,9 +18,52 @@ typedef struct grid_t
     Tile** tiles;          // compact array of tile pointers (size = houseSize)
     uint32_t currentIdx;
     Tile* activeTile;
-    InteractionCB* primaryInteraction;
-    InteractionCB* secondaryInteraction;
 } Grid;
+
+// ============================================================================
+// Test Guest kinds -- stand-ins until real Guest content/art exists.
+// Both share the same two behavior functions; only their data differs.
+// ============================================================================
+
+static void _guestShowColor(Tile* tile)
+{
+    guest* g = tileGetGuest(tile);
+    if (g != NULL && g->data != NULL)
+    {
+        tileSetColor(tile, g->data->testColor);
+    }
+}
+
+static void _guestHideColor(Tile* tile)
+{
+    tileSetColor(tile, 0xFFFFFFFF);
+}
+
+///////////////////////////////
+
+
+static const guest_data _testGuestA = {
+    .name = "TestGuestA",
+    .testColor = 0xFFFF0000,
+    .popularity = 1,
+    .money = 0,
+    .rowdiness = 0,
+    .star = false,
+    .onPrimaryInteract = _guestShowColor,
+    .onSecondaryInteract = _guestHideColor
+};
+
+
+static const guest_data _testGuestB = {
+    .name = "TestGuestB",
+    .testColor = 0xFF00FF00,
+    .popularity = 0,
+    .money = 1,
+    .rowdiness = 0,
+    .star = false,
+    .onPrimaryInteract = _guestShowColor,
+    .onSecondaryInteract = _guestHideColor
+};
 
 
 
@@ -68,11 +111,18 @@ void initTiles(Grid* grid)
         Tile* t = tileNewTest(tileTopCornerPos, (uint16_t)grid->tileWidth, (uint16_t)grid->tileHeight);
         assert(t != NULL);
 
-        uint32_t randColor = randGetInt(0, 256);
-        randColor += randGetInt(0, 256) << 8;
-        randColor += randGetInt(0, 256) << 16;
+        // Plant guests unevenly on purpose: proves per-tile dispatch reads
+        // *this* tile's guest, not a hardcoded fallback, and that every
+        // third tile is left empty (NULL) to confirm interaction safely no-ops.
+        if (i % 3 == 0)
+        {
+            tileSetGuest(t, guestNew(&_testGuestA));
+        }
+        else if (i % 3 == 1)
+        {
+            tileSetGuest(t, guestNew(&_testGuestB));
+        }
 
-        tileSetColor(t, randColor);
         grid->tiles[i] = t;
     }
 }
@@ -120,6 +170,11 @@ void gridDelete(Grid* grid)
 {
     for (size_t i = 0; i < grid->houseSize; ++i)
     {
+        guest* g = tileGetGuest(grid->tiles[i]);
+        if (g != NULL)
+        {
+            guestDelete(g);
+        }
         tileDelete(grid->tiles[i]);
     }
 
