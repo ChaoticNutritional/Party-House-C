@@ -12,12 +12,11 @@ Tile* tileNew(Coord2D topLeftStart, float width, float height);
 void tileDelete(Tile* tile);
 
 /// Callback:
-typedef void (*InteractionCB)(Tile*);
 void tileInvokeInteraction(Tile* tile);
 void tileInvokeCancel(Tile* tile);
 
 /// Guest occupancy: NULL guest means the tile is empty, and interaction is a no-op.
-/// Tile borrows the guest pointer -- it does not own or free it.
+/// Tile borrows the guest pointer. It does not own or free it.
 void tileSetGuest(Tile* tile, guest* g);
 guest* tileGetGuest(Tile* tile);
 void tileClearGuest(Tile* tile);

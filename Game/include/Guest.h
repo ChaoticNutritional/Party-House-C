@@ -1,12 +1,15 @@
 #pragma once
-#include "object.h"
+#include "baseTypes.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
-    typedef void (*InteractionCB)(guest*);
+    typedef struct tile_t Tile;
+    typedef void (*InteractionCB)(Tile*);
+    
+    typedef struct guest_t guest;
     
     typedef struct guest_data_t {
         const char* name;

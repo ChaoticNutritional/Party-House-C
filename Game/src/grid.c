@@ -34,14 +34,14 @@ static void _guestShowColor(Tile* tile)
     }
 }
 
-static void _guestHideColor(Tile* tile)
+static void _guestClearColor(Tile* tile)
 {
     tileSetColor(tile, 0xFFFFFFFF);
 }
 
-///////////////////////////////
-
-
+// ============================================================================
+// Sample Guest Base Schemas? Templates?
+// ============================================================================
 static const guest_data _testGuestA = {
     .name = "TestGuestA",
     .testColor = 0xFFFF0000,
@@ -50,9 +50,8 @@ static const guest_data _testGuestA = {
     .rowdiness = 0,
     .star = false,
     .onPrimaryInteract = _guestShowColor,
-    .onSecondaryInteract = _guestHideColor
+    .onSecondaryInteract = _guestClearColor
 };
-
 
 static const guest_data _testGuestB = {
     .name = "TestGuestB",
@@ -62,9 +61,9 @@ static const guest_data _testGuestB = {
     .rowdiness = 0,
     .star = false,
     .onPrimaryInteract = _guestShowColor,
-    .onSecondaryInteract = _guestHideColor
+    .onSecondaryInteract = NULL
 };
-
+//////////////////////////////////////////////////////////////////////////////////
 
 
 /// @brief 
@@ -111,9 +110,8 @@ void initTiles(Grid* grid)
         Tile* t = tileNewTest(tileTopCornerPos, (uint16_t)grid->tileWidth, (uint16_t)grid->tileHeight);
         assert(t != NULL);
 
-        // Plant guests unevenly on purpose: proves per-tile dispatch reads
-        // *this* tile's guest, not a hardcoded fallback, and that every
-        // third tile is left empty (NULL) to confirm interaction safely no-ops.
+        // TESTING: proves per-tile dispatch reads tile interaction data
+        // every third tile is left empty (NULL) to confirm interaction no-ops
         if (i % 3 == 0)
         {
             tileSetGuest(t, guestNew(&_testGuestA));
@@ -314,3 +312,9 @@ Tile* gridGetTile(const GridPayload gp)
 {
     return gp.grid->tiles[gp.tileIdx];
 }
+
+
+
+
+
+

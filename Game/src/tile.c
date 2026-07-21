@@ -54,7 +54,7 @@ Tile* tileNewTest(Coord2D topLeftStart, float width, float height)
 }
 
 
-/// @brief initialize a tile
+/*/// @brief initialize a tile
 /// @param topLeftStart - allows for adjustable bounds within a grid
 /// @param width 
 /// @param height 
@@ -79,7 +79,7 @@ Tile* tileNew(Coord2D topLeftStart, float width, float height)
     tile->color = 0xFFFFFFFF;
 
     return tile;
-}
+}*/
 
 /// Dtor
 void tileDelete(Tile* tile)
@@ -89,6 +89,9 @@ void tileDelete(Tile* tile)
 }
 
 
+/// @brief [TEST FUNC] Invoke primary interact button on tile occupant
+/// \ref "_guestShowColor"
+/// @param tile 
 void tileInvokeInteraction(Tile* tile)
 {
     if (tile != NULL && tile->occupant != NULL && tile->occupant->data != NULL
@@ -98,6 +101,9 @@ void tileInvokeInteraction(Tile* tile)
     }
 }
 
+/// @brief [TEST FUNC] Invoke secondary interact button - CLEAR'S TILE COLOR 
+/// \ref "_guestClearColor"
+/// @param tile
 void tileInvokeCancel(Tile* tile)
 {
     if (tile != NULL && tile->occupant != NULL && tile->occupant->data != NULL

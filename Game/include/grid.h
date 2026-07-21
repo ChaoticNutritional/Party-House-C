@@ -23,14 +23,15 @@ void gridDelete(Grid* grid);
 
 Bounds2D getATileBounds(const Grid* grid);
     
-// Input Callbacks
+// Input Callbacks known by the grid for gameplay
+// every grid used in the game should know about input existing.
 void gridPrimaryInput(void* ctx);
 void gridSecondaryInput(void* ctx);
 void gridGoNextTile(void* grid); 
 void gridGoPrevTile(void* grid); 
 void gridGoUpTile(void* grid); 
 void gridGoDownTile(void* grid); 
-void expandGrid(void* grid);
+void expandGrid(void* grid);    // experimental
 
 
 Tile* gridGetActiveTile(const Grid* grid);
